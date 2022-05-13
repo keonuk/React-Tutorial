@@ -43,9 +43,26 @@ const styles = theme => ({
 // 클래스 이용 컴포넌트 만들기
 class App extends React.Component{ 
   
-  state = {
-    customers: "",
-    completed: 0
+  // 생성자 이용하여 state 갱신
+  constructor(props) {
+    super(props);
+    this.state = {
+      customers: '',
+      completed: 0
+    }
+  }
+
+  // state를 초기화
+  stateRefresh = () => {
+    this.setState({
+      customers: '',
+      completed: 0
+    });
+
+    // 고객 data를 새로 불러온다
+    this.callApi()
+      .then(res => this.setState({customers: res}))
+      .catch(err => console.log(err));
   }
 
   componentDidMount() {
@@ -107,7 +124,8 @@ class App extends React.Component{
             </TableBody>
           </Table>
         </Paper>
-        <CustomerAdd/>
+        {/* 함수 자체를 props 형태로 보내줌 */}
+        <CustomerAdd stateRefresh={this.stateRefresh}/>
       </div>
     )
   }

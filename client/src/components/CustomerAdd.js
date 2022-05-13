@@ -21,8 +21,11 @@ class CustomerAdd extends React.Component {
         this.addCustomer()
             .then((response) => {
                 console.log(response.data);
+                // 서버로부터 고객을 추가한 이후에 응답을 받고나서
+                // refresh 실행
+                this.props.stateRefresh();
             });
-            
+
         this.setState({
             file: null,
             userName: '',
@@ -31,7 +34,6 @@ class CustomerAdd extends React.Component {
             job: '',
             fileName: ''
         });
-        window.location.reload();
     }
 
     handleFileChange = (e) => {
