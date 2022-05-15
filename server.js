@@ -27,7 +27,7 @@ const upload = multer({dest: './upload'});
 
 app.get('/api/customers', (req, res) => {
     connection.query(
-        "SELECT * FROM CUSTOMER",
+        "SELECT * FROM CUSTOMER WHERE isDeleted = 0",
         (err, rows, fields) => {
             res.send(rows);
         }
@@ -39,7 +39,7 @@ app.use('/image', express.static('./upload'));
 
 // post 방식으로 경로에 사용자가 고객추가 데이터를 전송했을 때 처리
 app.post('/api/customers', upload.single('image'), (req, res) => {
-    let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?)';
+    let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?, now(), 0)';
     let image = '/image/' + req.file.filename; // multer 라이브러리가 자동으로 겹치지않는 이름 핟당
     let name = req.body.name;
     let birthday = req.body.birthday;
@@ -52,6 +52,14 @@ app.post('/api/customers', upload.single('image'), (req, res) => {
         (err, rows, fields) => {
             res.send(rows);
         });
+});
+
+app.delete('/api/customers/:id', (req, res) => {
+    let sql = 'UPDATE CUSTOMER SET isDeleted = 1 WHERE ID = ?';
+    let params = [req.params.id];
+    connection.query(sql, params, (err, rows, fields) => {
+        res.send(rows);
+    });
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

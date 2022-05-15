@@ -1,6 +1,7 @@
 import React from 'react';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import CustomerDelete from './CustomerDelete';
 
 class Customer extends React.Component{ 
     render(){ // 항상 수행되는 내용 Customer 컴포넌트를 화면에 그리고자 할때 실제로 그려지는 내용이 담김
@@ -11,7 +12,8 @@ class Customer extends React.Component{
                 <TableCell>{this.props.name}</TableCell>
                 <TableCell>{this.props.birthday}</TableCell>
                 <TableCell>{this.props.gender}</TableCell>
-                <TableCell>{this.props.job}</TableCell>                
+                <TableCell>{this.props.job}</TableCell>
+                <TableCell><CustomerDelete stateRefresh={this.props.stateRefresh} id={this.props.id} /></TableCell>
             </TableRow>
         )
     }
