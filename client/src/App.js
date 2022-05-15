@@ -23,7 +23,7 @@ import InputBase from '@material-ui/core/InputBase';
 import MenuIcon from '@material-ui/icons/Menu';
 //import Search from '@material-ui/icons/Search';
 import SearchIcon from '@material-ui/icons/Search';
-//import SearchIconWrapper from '@material-ui/icons/Search';
+import SearchIconWrapper from '@material-ui/icons/Search';
 
 
 /* 
@@ -77,17 +77,7 @@ const Searchs = styled('div')(({ theme }) => ({
   },
 }));
 
-const SearchIconWrappers = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const StyledInputBases = styled(InputBase)(({ theme }) => ({
+const InputBases = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
@@ -112,7 +102,8 @@ class App extends React.Component{
     super(props);
     this.state = {
       customers: '',
-      completed: 0
+      completed: 0,
+      searchKeyword: ''
     }
   }
 
@@ -120,7 +111,8 @@ class App extends React.Component{
   stateRefresh = () => {
     this.setState({
       customers: '',
-      completed: 0
+      completed: 0,
+      searchKeyword: ''
     });
 
     // 고객 data를 새로 불러온다
@@ -147,7 +139,22 @@ class App extends React.Component{
     this.setState({completed: completed >= 100 ? 0 : completed + 1});
   }
 
+  // 입력값을 상태변화로 감지해서 실제로 리액트 내부에서 데이터를 가지고 있도록 하는 함수
+  handleValueChange = (e) => {
+    let nextState = {};
+    nextState[e.target.name] = e.target.value;
+    this.setState(nextState);
+  }
+
   render(){
+    const filteredComponents = (data) => {
+      data = data.filter((c) => {
+        return c.name.indexOf(this.state.searchKeyword) > -1;
+      });
+      return data.map((c) => {
+        return <Customer stateRefresh={this.stateRefresh} key={c.id} id={c.id} image={c.image} name={c.name} birthday={c.birthday} gender={c.gender} job={c.job}/>
+      });
+    }
     const {classes} = this.props;
     const cellList = ["번호", "프로필 이미지", "이름", "생년월일", "성별", "직업", "설정"];
     return(
@@ -173,12 +180,15 @@ class App extends React.Component{
                 고객 관리 시스템
               </Typography>
               <Searchs>
-                <SearchIconWrappers>
+                <SearchIconWrapper>
                   <SearchIcon />
-                </SearchIconWrappers>
-                <StyledInputBases
-                  placeholder="           검색하기"
+                </SearchIconWrapper>
+                <InputBases
+                  placeholder="검색하기"
                   inputProps={{ 'aria-label': 'search' }}
+                  name="searchKeyword"
+                  value={this.state.searchKeyword}
+                  onChange={this.handleValueChange}
                 />
               </Searchs>
             </Toolbar>
@@ -198,22 +208,8 @@ class App extends React.Component{
               </TableRow>
             </TableHead>
             <TableBody>
-                {/* 특정 배열 각 원소에 접근해서 그 원소를 어떻게 처리할지(파이선과 문법 동일) */}
-                {/* map을 이용할때는 key={} props 사용해야함(콘솔 오류) */}
-                {this.state.customers ? this.state.customers.map(c => {
-                  return (
-                    <Customer
-                      stateRefresh={this.stateRefresh}
-                      key={c.id}
-                      id={c.id}
-                      image={c.image}
-                      name={c.name}
-                      birthday={c.birthday}
-                      gender={c.gender}
-                      job={c.job}
-                      />
-                  );   
-                }) : 
+                {this.state.customers ? 
+                  filteredComponents(this.state.customers) :
                 <TableRow>
                   <TableCell colSpan="6" align="center">
                     <CircularProgress className={classes.progress} variant="determinate" value={this.state.completed}/>
